@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "map_uri": "map1.png",
+    "map_name": "Map 1",
+    "answer": {
+      "start": 100,
+      "end": 200
+    }
+  },
+  {
+    "id": 2,
+    "map_uri": "map2.png",
+    "map_name": "Map 2",
+    "answer": {
+      "start": 300,
+      "end": 400
+    }
+  }
+]
