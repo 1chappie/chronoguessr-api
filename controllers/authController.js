@@ -1,6 +1,7 @@
 const tokenService = require('../services/tokenService.js');
 const userService = require('../services/userService.js');
 const ms = require('ms');
+const sessionService = require("../services/sessionService.js");
 
 function createRTCookie(res, refreshToken) {
     res.cookie(
@@ -33,9 +34,10 @@ exports.login = async (req, res, next) => {
 exports.refreshToken = async (req, res, next) => {
     try {
         const cookies = req.cookies;
-        if (!cookies?.jwtRT)
-            res.status(401).json({error: "No refresh token provided"});
-        res.json({accessToken: await tokenService.refreshAccessToken(cookies.jwtRT)});
+        if (!cookies?.jwtRT) {
+            return res.status(401).json({error: "No refresh token provided"});
+        }
+        res.json({accessToken: await tokenService.refreshAccessToken(cookies?.jwtRT)});
     } catch (error) {
         console.log(error);
         res.status(403).json({error: "Invalid refresh token"});
@@ -65,11 +67,14 @@ exports.logout = async (req, res, next) => {
         const cookies = req.cookies;
         if (!cookies?.jwtRT)
             res.status(204).json({error: "No refresh token provided"});
+        // const decodedToken = tokenService.decode(req.headers.authorization);
+        // const user = await userService.getOne(decodedToken?.username);
+        // await sessionService.finishAllOfUser(user)
         await tokenService.deleteByToken(cookies.jwtRT);
         res.clearCookie('jwtRT', {httpOnly: true, secure: true, sameSite: 'none'});
         res.json({message: "Logged out"});
     } catch (error) {
         console.log(error);
-        res.status(403).json({error: "Invalid refresh token"});
+        res.status(403).json({error: "Could not log out"});
     }
 }

@@ -7,6 +7,7 @@ var indexRouter = require('./routes/indexRoutes');
 var usersRouter = require('./routes/usersRoutes');
 const dataRouter = require('./routes/dataRoutes');
 const authRouter = require('./routes/authRoutes');
+const gameRouter = require('./routes/gameRoutes');
 const cors = require("cors");
 const {corsOptions} = require("./config/cors");
 
@@ -23,5 +24,6 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/data', dataRouter);
 app.use('/auth', authRouter);
+app.use('/game', gameRouter);
 
 module.exports = app;

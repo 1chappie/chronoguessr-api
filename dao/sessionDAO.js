@@ -18,10 +18,10 @@ module.exports = class sessionDAO {
                 session.endTime, // at creation, endTime is null
                 session.inProgress, // in progress starts as 1
                 session.finalScore, // finalScore starts as 0
-                session.roundCount // roundCount is an integer, starts at 1
+                session.roundCount // roundCount is an integer, starts at 0
             ]);
             return new sessionModel({
-                ...sessionInitializer,
+                ...session,
                 id: result.insertId
             });
         } catch (err) {
@@ -73,16 +73,32 @@ module.exports = class sessionDAO {
 
     static async readOneById(id) {
         const sql = 'SELECT * FROM sessions WHERE session_id = ?';
-        return this.#readOne(sql, [id]);
+        return await this.#readOne(sql, [id]);
+    }
+
+    static async readOneByIdInProgress(id) {
+        const sql = 'SELECT * FROM sessions WHERE session_id = ? AND in_progress = 1';
+        return await this.#readOne(sql, [id]);
     }
 
     static async readOneByUserId(userId) {
         const sql = 'SELECT * FROM sessions WHERE user_id = ?';
-        return this.#readOne(sql, [userId]);
+        return await this.#readOne(sql, [userId]);
+    }
+
+    static async readOneByUserIdInProgress(userId) {
+        const sql = 'SELECT * FROM sessions WHERE user_id = ? AND in_progress = 1';
+        return await this.#readOne(sql, [userId]);
+    }
+
+    static async readOneByUsername(username) {
+        const sql = 'SELECT * FROM sessions WHERE user_id = (SELECT user_id FROM users WHERE username = ?)';
+        return await this.#readOne(sql, [username]);
     }
 
     static async update(session) {
         try {
+            console.log(session)
             const sql = 'UPDATE sessions SET end_time = ?, in_progress = ?, final_score = ?, round_count = ? WHERE session_id = ?';
             await executeQuery(sql, [
                 session.endTime,
@@ -110,12 +126,12 @@ module.exports = class sessionDAO {
 
     static async deleteById(id) {
         const sql = 'DELETE FROM sessions WHERE session_id = ?';
-        return this.#delete(sql, [id]);
+        return await this.#delete(sql, [id]);
     }
 
     static async deleteByUserId(userId) {
         const sql = 'DELETE FROM sessions WHERE user_id = ?';
-        return this.#delete(sql, [userId]);
+        return await this.#delete(sql, [userId]);
     }
 
 }

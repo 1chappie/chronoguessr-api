@@ -45,6 +45,7 @@ exports.generateTokens = async (user) => {
 }
 
 exports.refreshAccessToken = async (refreshTokenValue) => {
+    if(!refreshTokenValue) throw new Error("No refresh token provided");
     if (!await rtokenDAO.readOneByToken(refreshTokenValue))
         throw new Error("Invalid refresh token");
     let newAccessToken;
@@ -90,4 +91,13 @@ exports.deleteByToken = async (rt) => {
 
 exports.deleteByUserId = async (userId) => {
     return await rtokenDAO.deleteByUserId(userId);
+}
+
+exports.decode = (token) => {
+    try {
+        token = token.split(' ')[1];
+        return jwt.decode(token);
+    } catch (err) {
+        return null;
+    }
 }

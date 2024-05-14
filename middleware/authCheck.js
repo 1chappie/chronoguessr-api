@@ -1,4 +1,7 @@
 const jwt = require('jsonwebtoken');
+const sessionService = require("../services/sessionService");
+const userService = require("../services/userService");
+const tokenService = require("../services/tokenService");
 
 exports.isAuthenticated = (req, res, next) => {
     const authHeader = req.headers.authorization || req.headers.Authorization;
@@ -28,3 +31,15 @@ exports.isAuthorized = (req, res, next) => {
 //todo
 }
 
+exports.ownsGameSession = async (req, res, next) => {
+    const session = await sessionService.getById(req.params.session_id);
+    const username = tokenService.decode(req.headers['authorization']).username;
+    const user = await userService.getOne(username);
+    if(!session) return res.status(404).json({message: 'Session not found'});
+    if(!user) return res.status(404).json({message: 'User not found'});
+    if (session.userId === user.id) {
+        next();
+    } else {
+        res.status(403).json({message: 'Forbidden'});
+    }
+}
